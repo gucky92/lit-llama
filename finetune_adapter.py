@@ -56,10 +56,11 @@ def main(
     data_dir: str = "data/alpaca", 
     pretrained_path: str = "checkpoints/lit-llama/7B/lit-llama.pth",
     out_dir: str = "out/adapter/alpaca",
+    accelerator: str = "auto",
 ):
 
     fabric = L.Fabric(
-        accelerator="cuda", 
+        accelerator=accelerator, 
         devices=devices, 
         strategy=(DeepSpeedStrategy(config=ds_config) if devices > 1 else "auto"), 
         precision="bf16-mixed",

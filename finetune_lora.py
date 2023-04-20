@@ -42,9 +42,10 @@ def main(
     data_dir: str = "data/alpaca", 
     pretrained_path: str = "checkpoints/lit-llama/7B/lit-llama.pth",
     out_dir: str = "out/lora/alpaca",
+    accelerator: str = "auto",
 ):
 
-    fabric = L.Fabric(accelerator="cuda", devices=1, precision="bf16-mixed")
+    fabric = L.Fabric(accelerator=accelerator, devices=1, precision="bf16-mixed")
     fabric.launch()
     fabric.seed_everything(1337 + fabric.global_rank)
 
