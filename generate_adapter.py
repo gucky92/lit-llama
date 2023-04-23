@@ -24,6 +24,7 @@ def main(
     max_new_tokens: int = 100,
     top_k: int = 200,
     temperature: float = 0.8,
+    accelerator: str = "auto",
 ) -> None:
     """Generates a response based on a given instruction and an optional input.
     This script will only work with checkpoints from the instruction-tuned LLaMA-Adapter model.
@@ -43,6 +44,8 @@ def main(
         top_k: The number of top most probable tokens to consider in the sampling process.
         temperature: A value controlling the randomness of the sampling process. Higher values result in more random
             samples.
+        accelerator: The hardware to run on. Possible choices are:
+            ``"cpu"``, ``"cuda"``, ``"mps"``, ``"gpu"``, ``"tpu"``, ``"auto"``.
     """
     if not adapter_path:
         adapter_path = Path("out/adapter/alpaca/lit-llama-adapter-finetuned.pth")
@@ -55,7 +58,7 @@ def main(
     assert pretrained_path.is_file()
     assert tokenizer_path.is_file()
 
-    fabric = L.Fabric(devices=1)
+    fabric = L.Fabric(accelerator=accelerator, devices=1)
     dtype = torch.bfloat16 if fabric.device.type == "cuda" and torch.cuda.is_bf16_supported() else torch.float32
 
     print("Loading model ...", file=sys.stderr)

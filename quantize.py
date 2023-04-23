@@ -143,6 +143,7 @@ def main(
     model_size: str = "7B",
     dtype: str = "float32",
     quantize: Optional[str] = None,
+    device: str = "cuda",
 ) -> None:
     """Generates text samples based on a pre-trained LLaMA model and tokenizer.
 
@@ -166,8 +167,6 @@ def main(
     assert output_path.parent.is_dir() and (
         not output_path.exists() or output_path.is_file()
     )
-
-    device = "cuda"
 
     dt = getattr(torch, dtype, None)
     if not isinstance(dt, torch.dtype):

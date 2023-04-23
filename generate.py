@@ -81,6 +81,7 @@ def main(
     tokenizer_path: Optional[Path] = None,
     model_size: str = "7B",
     quantize: Optional[str] = None,
+    accelerator: str = "auto",
 ) -> None:
     """Generates text samples based on a pre-trained LLaMA model and tokenizer.
 
@@ -97,6 +98,8 @@ def main(
         quantize: Whether to quantize the model and using which method:
             ``"llm.int8"``: LLM.int8() mode,
             ``"gptq.int4"``: GPTQ 4-bit mode.
+        accelerator: The hardware to run on. Possible choices are:
+            ``"cpu"``, ``"cuda"``, ``"mps"``, ``"gpu"``, ``"tpu"``, ``"auto"``.
     """
     if not checkpoint_path:
         checkpoint_path = Path(f"./checkpoints/lit-llama/{model_size}/lit-llama.pth")
@@ -105,7 +108,7 @@ def main(
     assert checkpoint_path.is_file(), checkpoint_path
     assert tokenizer_path.is_file(), tokenizer_path
 
-    fabric = L.Fabric(devices=1)
+    fabric = L.Fabric(accelerator=accelerator, devices=1)
     dtype = torch.bfloat16 if fabric.device.type == "cuda" and torch.cuda.is_bf16_supported() else torch.float32
 
     print("Loading model ...", file=sys.stderr)
