@@ -40,11 +40,17 @@ grad_clip = 1.0
 block_size = 1024
 
 
-def main() -> None:
+def main(
+    accelerator: str = "cuda",
+    precision: str = "bf16-mixed",
+    devices: int = 4,
+) -> None:
     auto_wrap_policy = partial(transformer_auto_wrap_policy, transformer_layer_cls={Block})
     strategy = FSDPStrategy(auto_wrap_policy=auto_wrap_policy, activation_checkpointing=Block)
 
-    fabric = L.Fabric(accelerator="cuda", devices=4, precision="bf16-mixed", strategy=strategy)
+    fabric = L.Fabric(
+        accelerator=accelerator, devices=devices, precision=precision, strategy=strategy
+    )
     fabric.launch()
     fabric.seed_everything(1337 + fabric.global_rank)
 
@@ -157,5 +163,6 @@ def load_datasets(data_dir: str = "data/shakespeare") -> Tuple[np.ndarray, np.nd
 
 
 if __name__ == "__main__":
+    from jsonargparse import CLI
     torch.set_float32_matmul_precision("high")
-    main()
+    CLI(main)
